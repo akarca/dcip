@@ -1,0 +1,116 @@
+{% extends base_template|default:"dcip/base.html" %}
+
+{% block title %}Datacenter IP Checker — Is Your IP from a VPN or Datacenter?{% endblock %}
+{% block description %}Check if an IP address belongs to a datacenter, cloud provider, or VPN service. Free API available.{% endblock %}
+
+{% block content %}
+<section class="hero" style="background: linear-gradient(135deg, #0a0e27 0%, #1a1040 50%, #0d1333 100%); padding: 3rem 0;">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <h1 class="title is-2 has-text-white">Datacenter IP Checker</h1>
+            <p class="subtitle is-5" style="color: rgba(255,255,255,0.7);">
+                Check if an IP address belongs to a datacenter, cloud provider, or VPN service
+            </p>
+
+            <div class="columns is-centered" style="margin-top: 2rem;">
+                <div class="column is-6">
+                    <form method="get" action="">
+                        <div class="field has-addons has-addons-centered">
+                            <div class="control is-expanded">
+                                <input class="input is-medium" type="text" name="ip"
+                                       value="{{ query_ip|default:client_ip }}"
+                                       placeholder="Enter an IP address (e.g. 8.8.8.8)">
+                            </div>
+                            <div class="control">
+                                <button type="submit" class="button is-primary is-medium">Check</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if result %}
+            <div class="columns is-centered">
+                <div class="column is-6">
+                    {% if result.error %}
+                    <div style="border-left: 4px solid #ffdd57; background: #fffdf5; padding: 1.5rem; margin-top: 1.5rem; border-radius: 4px;">
+                        <p class="has-text-weight-bold">Invalid IP address: {{ result.ip }}</p>
+                    </div>
+                    {% elif result.is_datacenter %}
+                    <div style="border-left: 4px solid #ff3860; background: #fff5f7; padding: 1.5rem; margin-top: 1.5rem; border-radius: 4px;">
+                        <p class="is-size-4 has-text-weight-bold has-text-danger">Datacenter IP Detected</p>
+                        <p class="is-size-5" style="margin-top: 0.5rem;">
+                            <code>{{ result.ip }}</code> belongs to
+                            <span style="display:inline-block;padding:0.25rem 0.75rem;border-radius:20px;background:#f5f5f5;font-weight:600;">{{ result.provider_name }}</span>
+                        </p>
+                        <p class="has-text-grey" style="margin-top: 0.5rem;">
+                            This IP is from a cloud/datacenter provider and is likely a VPN, proxy, or hosted server.
+                        </p>
+                    </div>
+                    {% else %}
+                    <div style="border-left: 4px solid #23d160; background: #f0fff4; padding: 1.5rem; margin-top: 1.5rem; border-radius: 4px;">
+                        <p class="is-size-4 has-text-weight-bold has-text-success">Residential IP</p>
+                        <p class="is-size-5" style="margin-top: 0.5rem;">
+                            <code>{{ result.ip }}</code> is not from a known datacenter.
+                        </p>
+                        <p class="has-text-grey" style="margin-top: 0.5rem;">
+                            This IP appears to be a regular residential or business connection.
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-8 is-offset-2">
+                <h2 class="title is-3">What is Datacenter IP Detection?</h2>
+                <div class="content">
+                    <p>
+                        Datacenter IP detection identifies whether an IP address originates from a cloud provider,
+                        hosting company, or VPN service rather than a regular residential internet connection.
+                    </p>
+                    <p>
+                        This is useful for fraud prevention, bot detection, ad verification, and understanding
+                        your website traffic.
+                    </p>
+                </div>
+
+                <h2 class="title is-3" style="margin-top: 2rem;">Providers We Detect</h2>
+                <div class="columns is-multiline">
+                    <div class="column is-4"><div class="box has-text-centered"><strong>Amazon AWS</strong></div></div>
+                    <div class="column is-4"><div class="box has-text-centered"><strong>Google Cloud</strong></div></div>
+                    <div class="column is-4"><div class="box has-text-centered"><strong>Microsoft Azure</strong></div></div>
+                    <div class="column is-4"><div class="box has-text-centered"><strong>DigitalOcean</strong></div></div>
+                    <div class="column is-4"><div class="box has-text-centered"><strong>Hetzner</strong></div></div>
+                    <div class="column is-4"><div class="box has-text-centered"><strong>Oracle Cloud</strong></div></div>
+                    <div class="column is-4"><div class="box has-text-centered"><strong>Linode / Akamai</strong></div></div>
+                    <div class="column is-4"><div class="box has-text-centered"><strong>Vultr</strong></div></div>
+                    <div class="column is-4"><div class="box has-text-centered"><strong>Cloudflare</strong></div></div>
+                    <div class="column is-4"><div class="box has-text-centered"><strong>Alibaba Cloud</strong></div></div>
+                    <div class="column is-4"><div class="box has-text-centered"><strong>+ 50,000 more</strong></div></div>
+                </div>
+
+                <h2 class="title is-3" style="margin-top: 2rem;">Free API</h2>
+                <div class="content">
+                    <p>Check any IP address programmatically:</p>
+                </div>
+
+                <pre style="background:#1e1e2e;color:#cdd6f4;border-radius:8px;padding:1.25rem;font-size:0.85rem;overflow-x:auto;">GET /api/dcip/8.8.8.8/
+
+{
+    "ip": "8.8.8.8",
+    "is_datacenter": true,
+    "provider": "gc",
+    "provider_name": "Google"
+}</pre>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
