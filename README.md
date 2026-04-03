@@ -2,10 +2,12 @@
 
 Django app for detecting datacenter, cloud provider, and VPN IP addresses.
 
+**Live demo & free API:** [https://ipaddress.world/datacenter-ip-checker/](https://ipaddress.world/datacenter-ip-checker/)
+
 ## Installation
 
 ```bash
-pip install git+https://github.com/NameOcean/dcip.git
+pip install git+https://github.com/akarca/dcip.git
 ```
 
 ## Setup
@@ -33,7 +35,7 @@ DATABASES = {
 DATABASE_ROUTERS = [..., "dcip.db_router.DCIPRouter"]
 ```
 
-3. Include URLs:
+3. Include URLs (or wire them manually in your urlpatterns):
 
 ```python
 from django.urls import include, path
@@ -44,7 +46,7 @@ urlpatterns = [
 ]
 ```
 
-4. Run migrations and populate the database:
+4. Populate the database:
 
 ```bash
 python manage.py migrate --database=server_ip
@@ -52,11 +54,15 @@ python manage.py generate_server_ip_db
 python manage.py merge_server_ip
 ```
 
-## API
+## Free API
+
+No API key required. Check any IPv4 address:
 
 ```
-GET /api/dcip/8.8.8.8/
+GET https://ipaddress.world/api/dcip/8.8.8.8/
+```
 
+```json
 {
     "ip": "8.8.8.8",
     "is_datacenter": true,
@@ -65,13 +71,36 @@ GET /api/dcip/8.8.8.8/
 }
 ```
 
+### Examples
+
+```bash
+# curl
+curl https://ipaddress.world/api/dcip/8.8.8.8/
+```
+
+```python
+# Python
+import requests
+r = requests.get("https://ipaddress.world/api/dcip/8.8.8.8/")
+print(r.json()["is_datacenter"])  # True
+```
+
+```javascript
+// JavaScript
+const r = await fetch("https://ipaddress.world/api/dcip/8.8.8.8/")
+const data = await r.json()
+console.log(data.is_datacenter) // true
+```
+
 ## Tool Page
 
-Visit `/datacenter-ip-checker/` for the web UI.
+Visit `/datacenter-ip-checker/` for the web UI with IP input form and results.
 
 ## Providers
 
 AWS, Google Cloud, Azure, DigitalOcean, Hetzner, Oracle, Linode, Akamai, Vultr, Cloudflare, Alibaba, and 50,000+ other datacenter ranges.
+
+Database updated daily from public sources.
 
 ## Programmatic Usage
 
@@ -79,4 +108,9 @@ AWS, Google Cloud, Azure, DigitalOcean, Hetzner, Oracle, Linode, Akamai, Vultr, 
 from dcip.views import check_ip
 
 is_datacenter, provider_slug, provider_name = check_ip("8.8.8.8")
+# (True, "gc", "Google")
 ```
+
+## License
+
+MIT
